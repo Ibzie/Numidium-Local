@@ -341,9 +341,25 @@ NO explanations, NO code blocks, NO other text - ONLY the JSON when user wants f
    */
   private extractFunctionCall(responseText: string): FunctionCall | null {
     try {
-      const trimmed = responseText.trim();
-      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
-        const parsed = JSON.parse(trimmed);
+      let jsonContent = responseText.trim();
+
+      // Handle markdown code blocks (```json...``` or ```...```)
+      const codeBlockPatterns = [
+        /```json\s*\n?([\s\S]*?)\n?```/i,
+        /```\s*\n?([\s\S]*?)\n?```/i
+      ];
+
+      for (const pattern of codeBlockPatterns) {
+        const match = jsonContent.match(pattern);
+        if (match) {
+          jsonContent = match[1].trim();
+          break;
+        }
+      }
+
+      // Try direct JSON parsing
+      if (jsonContent.startsWith('{') && jsonContent.endsWith('}')) {
+        const parsed = JSON.parse(jsonContent);
         if (parsed.function_call && parsed.function_call.name) {
           return {
             name: parsed.function_call.name,
@@ -352,7 +368,7 @@ NO explanations, NO code blocks, NO other text - ONLY the JSON when user wants f
         }
       }
     } catch (error) {
-      console.log('Direct JSON parse failed, trying regex patterns');
+      console.log('Function call extraction failed:', error instanceof Error ? error.message : String(error));
     }
 
     return null;

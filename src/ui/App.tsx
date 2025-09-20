@@ -200,8 +200,8 @@ export default function App() {
         }));
       }
 
-      // Generate AI response with structured function calling
-      const result = await session.generateResponseWithTools(message);
+      // Generate AI response with intelligent tool calling
+      const result = await session.generateResponseWithIntelligentTools(message);
       
       // Add execution info if tools were used
       let content = result.response;

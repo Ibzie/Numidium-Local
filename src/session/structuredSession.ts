@@ -11,6 +11,7 @@ import { Content } from '../types.js';
 import { AiCliSession, SessionConfig } from './session.js';
 import { OllamaApiService, ApiRequest, ApiResponse, FunctionCall } from '../api/ollamaApiService.js';
 import { ToolRegistry, StructuredTool, ToolResult, ToolCallConfirmationDetails } from '../tools/toolRegistry.js';
+import { ToolOrchestrator, ToolExecutionContext, ToolExecutionResult as OrchestratorResult } from '../tools/toolOrchestrator.js';
 import { processAIResponse } from '../utils/responseFilter.js';
 import { createSystemMessage } from '../prompts/system.js';
 
@@ -52,12 +53,14 @@ export interface ToolExecutionResult {
 export class StructuredSession extends AiCliSession {
   private apiService!: OllamaApiService;
   private toolRegistry: ToolRegistry;
+  private toolOrchestrator: ToolOrchestrator;
   private permissionHandler: ((request: ToolCallConfirmationDetails) => Promise<boolean>) | null = null;
   private conversationContext: number[] = [];
 
   constructor(config: StructuredSessionConfig, baseDirectory: string = process.cwd()) {
     super(config);
     this.toolRegistry = new ToolRegistry();
+    this.toolOrchestrator = new ToolOrchestrator(this.toolRegistry);
   }
 
   /**
@@ -90,10 +93,71 @@ export class StructuredSession extends AiCliSession {
    */
   setPermissionHandler(handler: (request: ToolCallConfirmationDetails) => Promise<boolean>): void {
     this.permissionHandler = handler;
+    // Update orchestrator with new permission handler
+    this.toolOrchestrator = new ToolOrchestrator(this.toolRegistry, handler);
   }
 
   /**
-   * Generate response with structured function calling
+   * Generate response with intelligent tool calling (new enhanced version)
+   */
+  async generateResponseWithIntelligentTools(userInput: string): Promise<StructuredSessionResponse> {
+    if (!this.apiService) {
+      await this.initialize();
+    }
+
+    const startTime = performance.now();
+
+    // Add user message to conversation
+    await this.addMessage({
+      role: 'user',
+      parts: [{ text: userInput }]
+    });
+
+    // Create execution context
+    const context: ToolExecutionContext = {
+      userInput,
+      workingDirectory: process.cwd(),
+      availableTools: this.toolRegistry.getAllTools().map(t => t.name),
+      conversationHistory: this.getState().conversationHistory.slice(-5).map(h =>
+        h.parts.map(p => p.text || '[non-text]').join('')
+      )
+    };
+
+    // Try intelligent tool orchestration first
+    const orchestrationResult = await this.toolOrchestrator.orchestrateToolCall(context);
+
+    if (orchestrationResult.success && orchestrationResult.result) {
+      // Tool was executed successfully
+      const response = this.toolOrchestrator.formatToolExecutionResponse(orchestrationResult, userInput);
+
+      // Add AI response to conversation
+      await this.addMessage({
+        role: 'model',
+        parts: [{ text: response }]
+      });
+
+      return {
+        response,
+        toolExecutions: [{
+          toolName: orchestrationResult.toolCall?.name || 'unknown',
+          params: orchestrationResult.toolCall?.arguments || {},
+          result: orchestrationResult.result,
+          executionTime: orchestrationResult.executionTime,
+          confirmed: true
+        }],
+        modelStats: {
+          model: this.getState().currentModel,
+          responseTime: performance.now() - startTime
+        }
+      };
+    }
+
+    // Fallback to LLM-based approach if automatic detection failed
+    return this.generateResponseWithTools(userInput);
+  }
+
+  /**
+   * Generate response with structured function calling (legacy method)
    */
   async generateResponseWithTools(userInput: string): Promise<StructuredSessionResponse> {
     if (!this.apiService) {
@@ -174,7 +238,12 @@ export class StructuredSession extends AiCliSession {
 
         // Continue conversation with function result
         const followupPrompt = toolExecution.result.success
-          ? `The ${apiResponse.function_call.name} function was executed successfully. Please provide a helpful response to the user about what was accomplished.`
+          ? `User request: "${userInput}"
+
+The ${apiResponse.function_call.name} function was executed successfully and returned:
+${toolExecution.result.content}
+
+Please provide a helpful response to the user based on their original request and the data you now have access to.`
           : `The ${apiResponse.function_call.name} function failed with error: ${toolExecution.result.error}. Please help the user understand what went wrong and suggest next steps.`;
 
         request.prompt = followupPrompt;

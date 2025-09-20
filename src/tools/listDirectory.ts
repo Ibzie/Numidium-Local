@@ -1,5 +1,7 @@
 /**
- * List Directory Tool - Following Gemini CLI Architecture
+ * Directory lister - shows what's in a folder
+ *
+ * Like ls but with better formatting and file size info
  */
 
 import fs from 'fs/promises';

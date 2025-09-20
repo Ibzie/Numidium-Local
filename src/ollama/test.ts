@@ -1,14 +1,8 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/**
- * Basic functionality test for Ollama integration
- * 
- * This is a simple test to validate that the Ollama integration is working
- * before running the full application.
+ * Basic Ollama connectivity test
+ *
+ * Quick sanity check to make sure Ollama is running and has models.
+ * Useful for debugging when things go sideways.
  */
 
 import { OllamaClient } from './client.js';
@@ -17,8 +11,8 @@ import { OllamaAuthManager } from './auth.js';
 import { createOllamaContentGenerator } from './contentGenerator.js';
 
 async function testOllamaBasicFunctionality(): Promise<void> {
-  console.log('🚀 LocalGemini CLI - Ollama Integration Test');
-  console.log('===============================================');
+  console.log('🚀 Numidium-Local - Ollama Test');
+  console.log('================================');
 
   try {
     // Test 1: Ollama service health
@@ -74,7 +68,7 @@ async function testOllamaBasicFunctionality(): Promise<void> {
       const testPrompt = {
         contents: [{
           role: 'user' as const,
-          parts: [{ text: 'Say "Hello from LocalGemini CLI!" and nothing else.' }]
+          parts: [{ text: 'Say "Hello from Numidium-Local!" and nothing else.' }]
         }]
       };
 
@@ -99,7 +93,7 @@ async function testOllamaBasicFunctionality(): Promise<void> {
     }
 
     console.log('\n🎉 All tests completed successfully!');
-    console.log('✅ LocalGemini CLI Ollama integration is functional');
+    console.log('✅ Numidium-Local Ollama integration is functional');
 
   } catch (error) {
     console.error('\n❌ Test failed with error:');

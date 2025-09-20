@@ -1,8 +1,8 @@
 /**
- * Write File Tool - Following Gemini CLI Architecture
- * 
- * Proper structured tool definition with JSON schema
- * for use with function calling APIs
+ * File writer tool that actually works
+ *
+ * Creates/overwrites files with content. Has basic safety checks
+ * to prevent writing to system directories (you're welcome)
  */
 
 import fs from 'fs/promises';

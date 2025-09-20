@@ -1,8 +1,8 @@
 /**
- * Tool Registry - Following Gemini CLI Architecture
- * 
- * Manages structured tool definitions with JSON schemas
- * for proper function calling integration
+ * Central registry for all the tools the AI can use
+ *
+ * Keeps track of what tools exist, validates parameters, and handles
+ * the permission system so the AI doesn't accidentally rm -rf your computer
  */
 
 import { WriteFileTool } from './properWriteFile.js';

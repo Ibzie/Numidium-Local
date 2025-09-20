@@ -1,5 +1,7 @@
 /**
- * Read File Tool - Following Gemini CLI Architecture
+ * File reader - reads files and returns their content
+ *
+ * Supports line limits because nobody wants to read a 10MB log file in the terminal
  */
 
 import fs from 'fs/promises';

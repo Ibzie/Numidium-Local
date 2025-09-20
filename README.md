@@ -17,70 +17,76 @@ A persistent interactive terminal application that provides Claude Code-like exp
 
 ```mermaid
 graph TB
-    subgraph "User Interface Layer"
-        UI[Terminal UI<br/>React + Ink]
-        SC[Slash Commands<br/>/h, /m, /s, /c]
-        SB[Status Bar<br/>Model & Session Info]
+    subgraph "Terminal UI"
+        UI[React App<br/>Chat + Input]
+        SM[Slash Menu<br/>/h /m /s /c /q]
+        PD[Permission Dialog<br/>Tool Confirmations]
+        SB[Status Bar<br/>Model & Session]
     end
 
     subgraph "Session Management"
-        SS[Structured Session<br/>Context & State]
-        TC[Task Tracker<br/>Progress Monitoring]
-        PM[Permission Manager<br/>Tool Confirmations]
-    end
-
-    subgraph "AI Processing Layer"
-        AS[API Service<br/>Request Orchestration]
-        FC[Function Calling<br/>Tool Discovery]
-        RP[Response Parser<br/>JSON Extraction]
+        SS[Structured Session<br/>Main Controller]
+        TT[Task Tracker<br/>Progress Monitoring]
     end
 
     subgraph "Tool System"
-        TR[Tool Registry<br/>Schema Definitions]
-        WF[Write File Tool]
-        RF[Read File Tool]
-        SH[Shell Command Tool]
-        LD[List Directory Tool]
+        TO[Tool Orchestrator<br/>Smart Routing]
+        IC[Intent Classifier<br/>Regex Patterns]
+        TR[Tool Registry<br/>Schema & Validation]
     end
 
-    subgraph "Ollama Integration"
-        OC[Ollama Client<br/>HTTP API Wrapper]
-        MM[Model Manager<br/>Auto Discovery]
-        OS[Ollama Service<br/>Local AI Runtime]
+    subgraph "Individual Tools"
+        WF[Write File]
+        RF[Read File]
+        LD[List Directory]
+        SH[Shell Commands]
+    end
+
+    subgraph "AI Integration"
+        AS[API Service<br/>Request Handler]
+        FP[Function Parser<br/>JSON Extraction]
+        OC[Ollama Client<br/>HTTP Wrapper]
+    end
+
+    subgraph "External"
+        OS[Ollama Service<br/>Local AI Models]
     end
 
     UI --> SS
-    SC --> SS
+    SM --> SS
+    PD --> TR
     SB --> SS
 
+    SS --> TO
+    SS --> TT
     SS --> AS
-    SS --> TC
-    SS --> PM
 
-    AS --> FC
-    FC --> RP
-    AS --> OC
+    TO --> IC
+    TO --> TR
+    IC --> TR
 
-    FC --> TR
     TR --> WF
     TR --> RF
-    TR --> SH
     TR --> LD
+    TR --> SH
 
-    OC --> MM
-    MM --> OS
+    AS --> FP
+    AS --> OC
+    FP --> TO
 
-    classDef ui fill:#E8F4FD,stroke:#1E3A8A,stroke-width:2px,color:#1E3A8A
-    classDef session fill:#F0FDF4,stroke:#166534,stroke-width:2px,color:#166534
-    classDef ai fill:#FEF3C7,stroke:#92400E,stroke-width:2px,color:#92400E
-    classDef tools fill:#FCE7F3,stroke:#BE185D,stroke-width:2px,color:#BE185D
-    classDef ollama fill:#F3E8FF,stroke:#7C2D12,stroke-width:2px,color:#7C2D12
+    OC --> OS
 
-    class UI,SC,SB ui
-    class SS,TC,PM session
-    class AS,FC,RP ai
-    class TR,WF,RF,SH,LD tools
-    class OC,MM,OS ollama
+    classDef ui fill:#E3F2FD,stroke:#1976D2,stroke-width:2px,color:#1976D2
+    classDef session fill:#E8F5E8,stroke:#388E3C,stroke-width:2px,color:#388E3C
+    classDef tools fill:#FCE4EC,stroke:#C2185B,stroke-width:2px,color:#C2185B
+    classDef ai fill:#FFF3E0,stroke:#F57C00,stroke-width:2px,color:#F57C00
+    classDef external fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px,color:#7B1FA2
+
+    class UI,SM,PD,SB ui
+    class SS,TT session
+    class TO,IC,TR,WF,RF,LD,SH tools
+    class AS,FP,OC ai
+    class OS external
 ```
 
 ## 🚀 Getting Started
@@ -161,15 +167,15 @@ Once running, use these commands in the terminal:
 - **`/q`** - Quit application
 - **`ESC`** - Quick exit
 
-### Tool Capabilities
+### What It Can Do
 
-Numidium-Local can help you with:
+The AI can help you with:
 
-- **File Operations** - Read, write, and modify files
-- **Shell Commands** - Execute terminal commands safely
-- **Project Analysis** - Understand codebases and dependencies
-- **Code Generation** - Create components, functions, and features
-- **Debugging** - Analyze errors and suggest fixes
+- **File stuff** - Read, write, edit files (with your permission)
+- **Shell commands** - Run terminal commands safely
+- **Project exploration** - Figure out what your codebase does
+- **Code generation** - Write components, functions, whatever you need
+- **Debugging** - Help when things inevitably break
 
 ### Example Interactions
 

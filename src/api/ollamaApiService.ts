@@ -1,8 +1,8 @@
 /**
- * Ollama API Service - Proper API Management
- * 
- * Based on Gemini CLI patterns, this creates a proper API abstraction
- * that aligns with professional coding assistant architectures.
+ * Ollama API wrapper that handles all the messy details
+ *
+ * Deals with model management, function calling, and the occasional
+ * "why is my JSON wrapped in markdown" moments that make you question life choices.
  */
 
 import { OllamaClient, OllamaGenerateResponse } from '../ollama/client.js';
@@ -368,7 +368,7 @@ NO explanations, NO code blocks, NO other text - ONLY the JSON when user wants f
         }
       }
     } catch (error) {
-      console.log('Function call extraction failed:', error instanceof Error ? error.message : String(error));
+      // Function call extraction failed - silently continue
     }
 
     return null;

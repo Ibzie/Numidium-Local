@@ -1,9 +1,7 @@
-#!/usr/bin/env node
-
 /**
  * Ollama API Manager Script
  * 
- * Professional Ollama service management following Claude Code patterns.
+ * Ollama service management following Claude Code patterns.
  * Handles starting, stopping, and managing Ollama API service.
  */
 

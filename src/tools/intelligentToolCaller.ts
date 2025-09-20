@@ -1,6 +1,8 @@
 /**
- * Intelligent Tool Calling System
- * Inspired by Claude SDK architecture for automatic tool detection and routing
+ * Smart tool detection - figures out what you want before you finish typing
+ *
+ * Uses regex patterns to catch common requests like "create file xyz" or "read abc.txt"
+ * Then falls back to LLM if the patterns don't match. Works surprisingly well.
  */
 
 export interface ToolCall {
@@ -17,12 +19,9 @@ export interface IntentPattern {
   confidence: number;
 }
 
-/**
- * Intelligent tool caller that combines intent detection with LLM function calling
- */
 export class IntelligentToolCaller {
   private intentPatterns: IntentPattern[] = [
-    // File creation patterns
+    // Catch "create file xyz" type requests
     {
       patterns: [
         /(?:file\s+name|filename|name)\s+(?:to\s+be|is|should\s+be)\s+['"']?([^'"'\s]+(?:\.[a-zA-Z0-9]+)?)['"']?/i,
@@ -41,7 +40,7 @@ export class IntelligentToolCaller {
       confidence: 0.9
     },
 
-    // File reading patterns
+    // "show me file.txt" patterns
     {
       patterns: [
         /(?:show|read|display|view|open|cat)\s+(?:me\s+)?(?:the\s+)?(?:file\s+)?['"']?([^'"'\s]+)['"']?/i,

@@ -1,5 +1,8 @@
 /**
- * Run Shell Command Tool - Following Gemini CLI Architecture
+ * Shell command runner with safety features
+ *
+ * Executes shell commands but tries to prevent you from doing anything too stupid.
+ * Has risk assessment because "rm -rf /" shouldn't be marked as "safe"
  */
 
 import { spawn } from 'child_process';

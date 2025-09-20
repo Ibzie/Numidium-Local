@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Numidium-Local - Your Local AI Development Agent
+ * Main entry point for Numidium-Local
  *
- * A persistent interactive terminal application powered by Ollama.
- * Provides Claude Code-like experience with local AI models.
+ * Just fires up the terminal UI and handles CLI args.
+ * Nothing fancy here, move along...
  */
 
 import { Command } from 'commander';
@@ -26,11 +26,9 @@ async function main() {
       .option('-v, --verbose', 'enable verbose output')
       .option('--debug', 'enable debug mode');
 
-    // Parse arguments first
     program.parse(process.argv);
     const options = program.opts();
 
-    // Check for help or version flags
     if (process.argv.includes('--help') || process.argv.includes('-h')) {
       program.help();
       return;
@@ -41,16 +39,14 @@ async function main() {
       return;
     }
 
-    // Start the interactive UI
+    // Show a fancy startup message because why not
     console.log(chalk.blue('🚀 Starting Numidium-Local...'));
     console.log(chalk.gray('Press Ctrl+C or ESC to exit, "/" for commands'));
-    
-    // Small delay to show startup message
+
+    // Dramatic pause for effect
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Check if we can run in interactive mode
     try {
-      // Render the React UI
       render(React.createElement(App));
     } catch (error) {
       console.error(chalk.red('Interactive mode not supported in this environment.'));
@@ -70,7 +66,7 @@ async function main() {
   }
 }
 
-// Handle graceful shutdown
+// Handle graceful shutdown (because manners matter)
 process.on('SIGINT', () => {
   console.log(chalk.yellow('\n👋 Goodbye!'));
   process.exit(0);
@@ -79,8 +75,6 @@ process.on('SIGINT', () => {
 process.on('SIGTERM', () => {
   process.exit(0);
 });
-
-// Run the CLI
 main().catch((error) => {
   console.error(chalk.red('Critical error:'), error);
   process.exit(1);

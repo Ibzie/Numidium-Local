@@ -1,7 +1,8 @@
 /**
- * Chat View Component
- * 
- * Displays conversation history with proper formatting and scrolling
+ * Chat view - renders the conversation history
+ *
+ * Scrollable message list with timestamps and role indicators.
+ * Handles the "thinking..." state when AI is processing
  */
 
 import React from 'react';

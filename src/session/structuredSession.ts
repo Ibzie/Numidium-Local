@@ -1,10 +1,9 @@
 /**
- * Structured Session - Following Gemini CLI Function Calling Architecture
+ * The main session handler that actually works
  *
- * This session implements proper structured function calling like Gemini CLI,
- * replacing the broken natural language parsing approach.
- *
- * TODO: Tool calling system needs improvement - contributions welcome!
+ * After way too many attempts at getting tool calling right, this finally
+ * handles both automatic intent detection AND proper LLM function calls.
+ * Inspired by Gemini CLI because they got it right the first time.
  */
 
 import { Content } from '../types.js';
@@ -203,13 +202,9 @@ export class StructuredSession extends AiCliSession {
       const apiResponse = await this.apiService.generateContent(request);
       this.conversationContext = apiResponse.context || [];
 
-      console.log('API Response:', { response: apiResponse.response, function_call: apiResponse.function_call });
-
       // Check if AI made a function call
       if (apiResponse.function_call) {
-        console.log('🔧 Function call detected, executing:', apiResponse.function_call);
         const toolExecution = await this.executeFunctionCall(apiResponse.function_call);
-        console.log('🔧 Tool execution result:', toolExecution);
         toolExecutions.push(toolExecution);
 
         // Add function call and result to conversation context
@@ -285,17 +280,12 @@ Please provide a helpful response to the user based on their original request an
     const startTime = performance.now();
     
     try {
-      console.log('🔧 Executing tool call:', functionCall.name, 'with args:', functionCall.arguments);
-      console.log('🔧 Permission handler available:', !!this.permissionHandler);
-      
       // Execute tool call through registry with permission handler
       const result = await this.toolRegistry.executeToolCall(
         functionCall.name,
         functionCall.arguments,
         this.permissionHandler || undefined
       );
-      
-      console.log('🔧 Tool registry returned result:', result);
 
       const executionTime = performance.now() - startTime;
 

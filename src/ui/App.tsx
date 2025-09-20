@@ -1,7 +1,8 @@
 /**
- * Main AI-CLI Interactive Terminal Application
- * 
- * Provides a persistent, interactive chat interface with Claude Code-like functionality
+ * Main React app for the terminal UI
+ *
+ * This is where all the magic happens - handles state, renders the chat,
+ * and somehow makes Ink work without losing my sanity
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -53,7 +54,7 @@ export default function App() {
   const [taskTracker, setTaskTracker] = useState<TaskTracker | null>(null);
   const [input, setInput] = useState('');
 
-  // Initialize session on startup
+  // Set up the AI session when component loads
   useEffect(() => {
     const config: StructuredSessionConfig = {
       ollamaHost: 'http://localhost:11434',
